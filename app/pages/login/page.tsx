@@ -24,7 +24,7 @@ export default function Login() {
                 setSuccess("Login successful!");
                 setError(""); // Clear any previous error messages
                 console.log(response);
-                router.push("/")
+                router.push("/pages/post")
             }
         } catch (err) {
             setError("Failed to login. Please check your credentials.");
