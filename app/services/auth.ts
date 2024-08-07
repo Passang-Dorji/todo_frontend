@@ -11,7 +11,8 @@ export async function userLogin(formdata: Record<string, string>): Promise<{ dat
             }
         });
 
-        const text = await response.text();
+        // const text = await response.text();
+        const data = await response.json();
 
         if (!response.ok) {
             console.error(`Request failed with status: ${response.status}`);
@@ -19,7 +20,7 @@ export async function userLogin(formdata: Record<string, string>): Promise<{ dat
         }
 
         try {
-            const data = JSON.parse(text);
+            // const data = JSON.parse(text);
             return data;
         } catch (err) {
             console.error('Failed to parse JSON:', err.message);

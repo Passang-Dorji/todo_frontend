@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { userLogin } from "@/app/services/auth";
 import { useRouter } from "next/navigation";
+import { UserContext } from "@/app/state/user-context";
 
 export default function Login() {
     const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function Login() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const router= useRouter()
+    const {setUser} = useContext(UserContext)
     async function handleLogin() {
         if (!formData.name || !formData.email) {
             setError("Name and email are required.");
@@ -22,8 +24,8 @@ export default function Login() {
             const response = await userLogin({ ...formData });
             if (response) {
                 setSuccess("Login successful!");
+                setUser(response)
                 setError(""); // Clear any previous error messages
-                console.log(response);
                 router.push("/pages/post")
             }
         } catch (err) {
