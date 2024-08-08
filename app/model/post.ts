@@ -4,3 +4,9 @@ export interface Posts{
     body:string
     user_id:number
 }
+
+export interface PostData{
+    title:string
+    body:string
+    user_id:number |undefined
+}

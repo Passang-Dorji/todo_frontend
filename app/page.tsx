@@ -1,31 +1,76 @@
-"use client"
-import { useState ,useEffect} from "react"
-import { fetchUser } from "./services/user"
-import type { Users } from "./model/user"
-export default function getUsers(){
-  const [users,setusers] = useState<Users[]>([])
-  useEffect(()=>{
-    async function loadUser() {
-      try{
-        const data = await fetchUser()
-        setusers(data.data)
-        console.log(data)
-      }catch (error){
-        console.error('Error fetching',error)
-      }  
+"use client";
+import { useState, useContext } from "react";
+import { userLogin } from "@/app/services/auth";
+import { useRouter } from "next/navigation";
+import { UserContext } from "@/app/state/user-context";
+
+export default function Login() {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: ""
+    });
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const router= useRouter()
+    const {setUser} = useContext(UserContext)
+    async function handleLogin() {
+        if (!formData.name || !formData.email) {
+            setError("Name and email are required.");
+            setSuccess("");
+            return;
+        }
+
+        try {
+            const response = await userLogin({ ...formData });
+            if (response) {
+                setSuccess("Login successful!");
+                setUser(response)
+                setError(""); // Clear any previous error messages
+                router.push("/pages/post")
+            }
+        } catch (err) {
+            setError("Failed to login. Please check your credentials.");
+            setSuccess(""); // Clear any previous success messages
+            console.error(err);
+        }
     }
-    loadUser()
-    
-  },[])
-  return (
-    <div className=" mt-4 ml-4 bg-purple-500">
-    { users.map(user =>(
-      <div key={user.id}>
-        <p className="text-black text-xl"> {user.name}</p>
-        <p className="text-black text-xl"> {user.email}</p>
-      </div>
-    )
-    )}
-    </div>
-  )
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    return (
+        <div className="flex justify-center items-center min-h-screen bg-purple-300">
+            <div className="bg-purple-500 p-8 rounded-lg shadow-lg w-full max-w-sm">
+                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+                <input
+                    className="text-black w-full mb-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    type="text"
+                    name="name"
+                    placeholder="Enter name"
+                    value={formData.name}
+                    onChange={handleChange}
+                />
+                <input
+                    className=" text-black w-full mb-4 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    type="text"
+                    name="email"
+                    placeholder="Enter email"
+                    value={formData.email}
+                    onChange={handleChange}
+                />
+                <button
+                    className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    onClick={handleLogin}
+                >
+                    Login
+                </button>
+                {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+                {success && <p className="text-green-500 text-center mt-4">{success}</p>}
+            </div>
+        </div>
+    );
 }
